@@ -203,3 +203,10 @@ When the program starts, it asks for five values. These are validated before the
 ## Closing Thought
 
 If you read the source and the guides together, the key lesson is not just how to use pthreads, it is how to think about shared state. The buffer is only safe because every update has a clearly defined owner, a protected critical section, and a wake-up rule for the other side of the handoff. That is the heart of producer-consumer programming.
+<div align="center">
+
+*The buffer is only safe because every update has a clearly defined owner,*
+*a protected critical section, and a wake-up rule for the other side.*
+<br/>
+_Built with ❤️ at FAST-NUCES Karachi_
+</div>
