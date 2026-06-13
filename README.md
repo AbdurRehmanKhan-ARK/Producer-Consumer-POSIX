@@ -36,14 +36,22 @@ The code is organized to make the producer-consumer pattern easy to trace from t
 
 ## 🎯 Scenario
 
-The classic producer-consumer problem asks a simple question: what happens when work is created faster or slower than it can be processed? In this simulation, producers add bags to a shared buffer, consumers remove them, and the buffer itself has a fixed capacity. If the belt fills up, producers must wait. If it empties out, consumers must wait.
+The classic producer-consumer problem asks a simple question: what happens when work is created faster or slower than it can be processed? In this simulation, producers add bags onto a shared conveyor belt, consumers pull them off, and the belt has a fixed capacity. If the belt fills, producers block. If it empties, consumers wait.
 
 ```mermaid
 flowchart LR
-	P["Producer threads<br/>ground_crew()"] -->|"belt_load(bag)"| B[(Shared bounded buffer<br/>g_belt)]
-	B -->|"belt_unload()"| C["Consumer threads<br/>sorter()"]
-	C -->|"shutdown sentinel is relayed"| B
+    P["⚙️ Producer Threads\nground_crew()\n3 threads"]
+    B[("🗄️ g_belt\nbounded buffer\nshared RAM")]
+    C["🔀 Consumer Threads\nsorter()\n2 threads"]
+
+    P -->|"belt_load(bag)"| B
+    B -->|"belt_unload()"| C
+    C -->|"sentinel relay\nbag_id == -1"| B
 ```
+
+> If the belt is **full** — producers block on `sem_wait(&g_belt.empty)`
+> If the belt is **empty** — consumers block on `sem_wait(&g_belt.full)`
+> Shutdown propagates via a sentinel bag through the consumer pool — no busy waiting.
 
 > [!NOTE]
 > The belt is not an abstract idea here, it is real shared memory in RAM. The entire exercise is about protecting that memory while still allowing several threads to work at the same time.
